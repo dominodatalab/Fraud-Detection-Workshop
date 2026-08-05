@@ -12,7 +12,7 @@ The pipeline is designed to work within the Domino Data Lab platform and uses
 MLflow for experiment tracking and model logging.
 """
 
-import io, os, time, subprocess, requests, json
+import io, os, sys, time, subprocess, requests, json
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -23,11 +23,10 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from domino import Domino
 from mlflow.models import infer_signature
-from domino_short_id import domino_short_id
 
 
 # Configure experiment name with a unique identifier to avoid conflicts
-experiment_name = f"CC Fraud Preprocessing {domino_short_id()}"
+experiment_name = f"CC Fraud Preprocessing test exp"
 
 # Define filenames for input and output data
 clean_filename = 'clean_cc_transactions.csv'  # Input: cleaned transaction data
@@ -165,7 +164,13 @@ if __name__ == "__main__":
         print('saved to ', f"{domino_dataset_dir}/{features_filename}")
     
         # Step 7: Generate comprehensive EDA report using ydata-profiling
-        from ydata_profiling import ProfileReport  # imported here b/c importing outside main slows down other references.
+        # imported here b/c importing outside main slows down other references.
+        try:
+            from ydata_profiling import ProfileReport
+        except ImportError:
+            print("ydata-profiling not found, installing via pip...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools<81", "ydata-profiling"])
+            from ydata_profiling import ProfileReport
         profile = ProfileReport(
             clean_df, 
             title="Credit Card Fraud Detection - EDA Report",

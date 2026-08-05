@@ -1,5 +1,5 @@
 # Data Exploration
-In this phase, we will begin the process of exploring a transactional dataset to see if it will be good for model training. We will read a CSV file from a Domino Data Source into a DataFrame, clean the data, generate some visualizations, and save the data to a Domino Dataset. We will begin from within your copy of the "Fraud Detection Workshop" project.
+In this phase, we will begin the process of exploring a transactional dataset to see if it will be good for model training. We will download the base transaction dataset from Kaggle into a DataFrame, clean the data, generate some visualizations, and save the data to a Domino Dataset. We will begin from within your copy of the "Fraud Detection Workshop" project.
 
 
 
@@ -16,17 +16,13 @@ In this phase, we will begin the process of exploring a transactional dataset to
 
 5. Open the notebook /mnt/code..../.../...
 
-6. In Data Sources at left, copy the Python snippet
+6. Run notebook cells (either manually or automatically)
 
-7. Paste Python snippet in cell where instructed
+7. Review generated metadata and plots
 
-8. Run notebook cells (either manually or automatically)
+8. Follow path to updated location in workspace
 
-9. Review generated metadata and plots
-
-10. Follow path to updated location in workspace
-
-11. Save and commit code
+9. Save and commit code
 
 This concludes the "Data Exploration" section of the workshop.
 
