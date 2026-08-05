@@ -1,7 +1,15 @@
 # File: trainer_ada.py
+import os
+import sys
 from pathlib import Path
 import json
 from sklearn.ensemble import AdaBoostClassifier
+
+# Add project root to Python path for module imports
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from exercises.d_TrainingAndEvaluation.generic_trainer import train_fraud
 
 # Load DataFrame from dataset 
