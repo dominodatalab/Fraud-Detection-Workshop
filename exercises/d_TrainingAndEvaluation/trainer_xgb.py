@@ -67,7 +67,7 @@ model_obj = XGBClassifier(
             eval_metric=args.eval_metric,
         )
 
-res = train_fraud(model_obj, model_name, transformed_df_filename)
+res = train_fraud(model_obj, model_name, transformed_df_filename, n_estimators=args.n_estimators)
 
 DROP = {"threshold_scan", "curves"}
 small = {k: v for k, v in res.items() if k not in DROP}

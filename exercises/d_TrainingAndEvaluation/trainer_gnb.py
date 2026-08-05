@@ -18,6 +18,9 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train a GaussianNB fraud detection classifier")
     parser.add_argument("--var-smoothing", type=float, default=1e-9,
                         help="Portion of the largest variance added to variances for calculation stability (default: 1e-9)")
+    parser.add_argument("--n-estimators", type=int, default=1,
+                        help="GaussianNB is not an ensemble, so this has no effect on training. "
+                             "Logged as a param for schema consistency with the AdaBoost/XGBoost trainers (default: 1)")
     parser.add_argument("--dataset", type=str, default=None,
                         help="Transformed features CSV filename. Overrides the "
                              "/workflow/inputs/transformed_filename Domino Flow input if set.")
@@ -41,7 +44,7 @@ else:
 model_name = 'GaussianNB'
 model_obj = GaussianNB(var_smoothing=args.var_smoothing)
 
-res = train_fraud(model_obj, model_name, transformed_df_filename)
+res = train_fraud(model_obj, model_name, transformed_df_filename, n_estimators=args.n_estimators)
 
 DROP = {"threshold_scan", "curves"}
 small = {k: v for k, v in res.items() if k not in DROP}

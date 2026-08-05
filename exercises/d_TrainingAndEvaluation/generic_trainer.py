@@ -568,7 +568,8 @@ def train_and_log(
     df: pd.DataFrame,
     X_train: pd.DataFrame, X_val: pd.DataFrame,
     y_train: pd.Series, y_val: pd.Series,
-    features: list
+    features: list,
+    n_estimators: int = 1,
 ):
     """
     Train the model, log parameters, metrics, plots, and model artifact to MLflow.
@@ -581,6 +582,9 @@ def train_and_log(
         mlflow.log_param("model_name", model.__class__.__name__)
         mlflow.log_param("num_features", len(features))
         mlflow.log_param("num_rows", len(df))
+        model_params = dict(model.get_params())
+        model_params["n_estimators"] = n_estimators
+        mlflow.log_params(model_params)
 
         params_yaml = {
             "model_name": model.__class__.__name__,
@@ -755,7 +759,7 @@ def train_and_log(
     return ret
 
 
-def train_fraud(model_obj, model_name, transformed_df_filename, random_state=None):
+def train_fraud(model_obj, model_name, transformed_df_filename, random_state=None, n_estimators=1):
 
     # Set up experiment
     mlflow.set_experiment(experiment_name)
@@ -796,7 +800,7 @@ def train_fraud(model_obj, model_name, transformed_df_filename, random_state=Non
     res = train_and_log(
         model_obj, model_name,
         df, X_train, X_val, y_train, y_val,
-        features
+        features, n_estimators=n_estimators
     )
     return res
 
