@@ -139,7 +139,7 @@ model:
   timestamp: application_timestamp
 endpoint:
   model_id: 6a748ceac9f8dc64202fc8c2
-  model_version_id: 6a748ceec9f8dc64202fc8c4
+  model_version_id: 6a74e3a87965a15bd605fb2d
   url: https://mrm.domino-eval.com/models/6a748ceac9f8dc64202fc8c2/latest/model
   token_file: .endpoint_token
   token_env_var: CREDITFRAUD_ENDPOINT_AUTH_TOKEN
