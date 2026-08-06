@@ -1,0 +1,58 @@
+# Filled config for the monitoring_blueprints WORKED EXAMPLE (blueprint_test_model).
+# This exact config proved the blueprint end-to-end on se-demo (see PROOF.md) — the live
+# Domino resources (endpoint, DMM monitor, scheduled jobs, MLflow model) have since been torn
+# down, so `endpoint.model_id`/`model_version_id` are reset to blank placeholders below. To
+# reuse this example, re-run: train.py -> deploy_endpoint.py -> fill the IDs it prints ->
+# create_baseline.py -> smoke_test_endpoint.py -> create_scheduled_jobs.py.
+
+model:
+  registered_model_name: blueprint_test_model
+  experiment_name: blueprint_test_model
+  features:
+    - {name: feature_a, valueType: numerical,   sample: 50.0}
+    - {name: feature_b, valueType: numerical,   sample: 20.0}
+    - {name: feature_c, valueType: categorical, sample: "cat_a"}
+  predictions:
+    - {name: prediction, valueType: numerical}
+    - {name: decision,   valueType: categorical}
+  row_identifier: row_identifier
+  timestamp: application_timestamp
+
+endpoint:
+  model_id: ""                                   # torn down after proving the blueprint — re-deploy to refill
+  model_version_id: ""
+  url: ""
+  token_file: .endpoint_token_blueprint_test     # gitignored
+  # This se-demo project ALSO monitors the scorecard, which already owns the generic
+  # ENDPOINT_AUTH_TOKEN/ENDPOINT_URL project env vars — namespace this model's token
+  # (see config.template.yaml note; scheduled jobs have no per-job env vars).
+  token_env_var: BLUEPRINT_TEST_ENDPOINT_AUTH_TOKEN
+
+monitoring:
+  monitor_model_name: blueprint_test_model
+  baseline_trainingset_name: blueprint_test_baseline
+  datasource_name: ""                            # ⚠️ PER-INSTANCE — fill with a real DMM S3 datasource
+                                                   # name for YOUR instance. "API-Datasource" (se-demo's)
+                                                   # will NOT exist elsewhere — do not copy it verbatim.
+  datasource_type: s3
+  drift_features: [feature_a, feature_c]         # the two we injected drift into
+  drift_algorithm: POPULATION STABILITY INDEX
+  psi_threshold: 0.2
+  prediction_path: blueprint_test_monitoring/prediction_data/
+  ground_truth_path: blueprint_test_monitoring/ground_truth_batches/
+
+traffic:
+  requests_per_run: 30
+  drift_switch_after_run: 5
+  maturation_window_hours: 6
+  scoring_log_subdir: blueprint_test_monitoring
+
+jobs:
+  load_generator_command: python monitoring_blueprints/example/load_generator.py
+  load_generator_cron: "0 0/15 * * * ?"
+  ground_truth_command: python monitoring_blueprints/example/ground_truth.py
+  ground_truth_cron: "0 0 0/2 * * ?"
+  ensure_drift_scheduled_command: python monitoring_blueprints/example/ensure_drift_scheduled.py
+  ensure_drift_scheduled_cron: "0 0/10 * * * ?"
+  timezone: America/New_York
+  git_ref: main

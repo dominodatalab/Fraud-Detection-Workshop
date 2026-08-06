@@ -1,0 +1,11 @@
+{
+  "feature_a_mean": 50.0,
+  "feature_a_std": 10.0,
+  "feature_b_mean": 20.0,
+  "feature_b_std": 5.0,
+  "cat_probs": {
+    "cat_a": 0.5,
+    "cat_b": 0.3,
+    "cat_c": 0.2
+  }
+}

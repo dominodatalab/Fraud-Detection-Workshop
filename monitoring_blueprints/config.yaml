@@ -1,0 +1,174 @@
+# Generated for CreditFraudModel (fraud-detection-workshop) — capture-aligned.
+# Feature schema pulled directly from MLflow signature of CreditFraudModel v2.
+model:
+  registered_model_name: CreditFraudModel
+  experiment_name: CreditFraudModel
+  features:
+  - name: num__Time
+    valueType: numerical
+    sample: 0.0
+  - name: num__Amount
+    valueType: numerical
+    sample: 0.0
+  - name: num__Age
+    valueType: numerical
+    sample: 0.0
+  - name: num__Tenure
+    valueType: numerical
+    sample: 0.0
+  - name: num__MerchantRisk
+    valueType: numerical
+    sample: 0.0
+  - name: num__DeviceTrust
+    valueType: numerical
+    sample: 0.0
+  - name: num__Txn24h
+    valueType: numerical
+    sample: 0.0
+  - name: num__Avg30d
+    valueType: numerical
+    sample: 0.0
+  - name: num__IPReputation
+    valueType: numerical
+    sample: 0.0
+  - name: num__Latitude
+    valueType: numerical
+    sample: 0.0
+  - name: num__Longitude
+    valueType: numerical
+    sample: 0.0
+  - name: num__DistFromHome
+    valueType: numerical
+    sample: 0.0
+  - name: num__Hour
+    valueType: numerical
+    sample: 0.0
+  - name: num__CardPresent
+    valueType: numerical
+    sample: 0.0
+  - name: num__amount_vs_avg30d_ratio
+    valueType: numerical
+    sample: 0.0
+  - name: num__risk_score
+    valueType: numerical
+    sample: 0.0
+  - name: num__trust_score
+    valueType: numerical
+    sample: 0.0
+  - name: cat__TxType_payment
+    valueType: numerical
+    sample: 0.0
+  - name: cat__TxType_purchase
+    valueType: numerical
+    sample: 0.0
+  - name: cat__TxType_transfer
+    valueType: numerical
+    sample: 0.0
+  - name: cat__TxType_withdrawal
+    valueType: numerical
+    sample: 0.0
+  - name: cat__DeviceType_ATM
+    valueType: numerical
+    sample: 0.0
+  - name: cat__DeviceType_POS
+    valueType: numerical
+    sample: 0.0
+  - name: cat__DeviceType_desktop
+    valueType: numerical
+    sample: 0.0
+  - name: cat__DeviceType_mobile
+    valueType: numerical
+    sample: 0.0
+  - name: cat__DeviceType_web
+    valueType: numerical
+    sample: 0.0
+  - name: cat__MerchantCat_clothing
+    valueType: numerical
+    sample: 0.0
+  - name: cat__MerchantCat_electronics
+    valueType: numerical
+    sample: 0.0
+  - name: cat__MerchantCat_entertainment
+    valueType: numerical
+    sample: 0.0
+  - name: cat__MerchantCat_gas
+    valueType: numerical
+    sample: 0.0
+  - name: cat__MerchantCat_grocery
+    valueType: numerical
+    sample: 0.0
+  - name: cat__MerchantCat_restaurant
+    valueType: numerical
+    sample: 0.0
+  - name: cat__MerchantCat_travel
+    valueType: numerical
+    sample: 0.0
+  - name: cat__MerchantCat_utilities
+    valueType: numerical
+    sample: 0.0
+  - name: cat__Channel_chip
+    valueType: numerical
+    sample: 0.0
+  - name: cat__Channel_contactless
+    valueType: numerical
+    sample: 0.0
+  - name: cat__Channel_in-store
+    valueType: numerical
+    sample: 0.0
+  - name: cat__Channel_online
+    valueType: numerical
+    sample: 0.0
+  - name: cat__generation_Baby Boomer
+    valueType: numerical
+    sample: 0.0
+  - name: cat__generation_Generation X
+    valueType: numerical
+    sample: 0.0
+  - name: cat__generation_Generation Z
+    valueType: numerical
+    sample: 0.0
+  - name: cat__generation_Millennial
+    valueType: numerical
+    sample: 0.0
+  predictions:
+  - name: prediction
+    valueType: numerical
+  - name: decision
+    valueType: categorical
+  row_identifier: event_id
+  timestamp: application_timestamp
+endpoint:
+  model_id: 6a748ceac9f8dc64202fc8c2
+  model_version_id: 6a748ceec9f8dc64202fc8c4
+  url: https://mrm.domino-eval.com/models/6a748ceac9f8dc64202fc8c2/latest/model
+  token_file: .endpoint_token
+  token_env_var: CREDITFRAUD_ENDPOINT_AUTH_TOKEN
+monitoring:
+  monitor_model_name: CreditFraudModel
+  baseline_trainingset_name: creditfraud_baseline
+  datasource_name: ''
+  datasource_type: s3
+  drift_features:
+  - num__Amount
+  - num__risk_score
+  - num__MerchantRisk
+  - num__amount_vs_avg30d_ratio
+  - num__DistFromHome
+  drift_algorithm: POPULATION STABILITY INDEX
+  psi_threshold: 0.2
+  prediction_path: monitoring/prediction_data/
+  ground_truth_path: monitoring/ground_truth_batches/
+traffic:
+  requests_per_run: 100
+  drift_switch_after_run: 8
+  maturation_window_hours: 6
+  scoring_log_subdir: monitoring
+jobs:
+  load_generator_command: python monitoring_blueprints/creditfraud_load_generator.py
+  load_generator_cron: 0 0/15 * * * ?
+  ground_truth_command: python monitoring_blueprints/creditfraud_ground_truth.py
+  ground_truth_cron: 0 0 0/2 * * ?
+  ensure_drift_scheduled_command: python monitoring_blueprints/scripts/ensure_drift_scheduled.py
+  ensure_drift_scheduled_cron: 0 0/10 * * * ?
+  timezone: America/New_York
+  git_ref: main

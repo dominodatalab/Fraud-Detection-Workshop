@@ -1,0 +1,76 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Model Monitoring blueprint — config template.
+#
+# Copy this file to `config.yaml` in the SAME DIRECTORY (right next to this template,
+# inside monitoring_blueprints/) and fill in for YOUR model + instance — that is where
+# scripts/config.py looks by default (it resolves relative to itself: ROOT = the
+# monitoring_blueprints/ directory, NOT your outer project's repo root).
+#
+# Monitoring more than one model, or want config.yaml somewhere else (e.g. its own
+# model-specific subdirectory)? Set the MONITORING_CONFIG env var to its full path
+# before running any script — see DOMINO_PLATFORM_NOTES.md / SETUP_GUIDE.md step 0.
+#
+# Precedence: env var > config.yaml > default. Instance runtime basics (project id,
+# domain, datasets dir, user, hardware tier) are read from the DOMINO_* env Domino
+# injects — not duplicated here.
+# ─────────────────────────────────────────────────────────────────────────────
+
+model:
+  registered_model_name: my_model          # MLflow registered model name
+  experiment_name: my_model
+
+  # Feature + prediction schema — drives deploy variables, smoke test, DMM registration.
+  # valueType ∈ numerical | categorical | string. `sample` is used by smoke_test_endpoint.py
+  # to build a valid request without any model-specific code (must match the mlflow signature's
+  # type — e.g. a float column needs a float sample, not an int; bools must be 0/1).
+  features:
+    - {name: feature_a, valueType: numerical,   sample: 1.0}
+    - {name: feature_b, valueType: numerical,   sample: 50.0}
+    - {name: feature_c, valueType: categorical, sample: "cat_a"}
+  predictions:                              # the model's captured outputs
+    - {name: prediction, valueType: numerical}
+    - {name: decision,   valueType: categorical}
+  row_identifier: row_identifier            # capture join key (event_id)
+  timestamp: application_timestamp
+
+endpoint:
+  model_id: ""                              # (per instance) Model API id — fill after deploy   [env: MODEL_ID]
+  model_version_id: ""                      # [env: MODEL_VERSION_ID]
+  url: ""                                   # optional explicit override; else derived {domain}/models/{model_id}/latest/model
+  token_file: .endpoint_token               # gitignored file with the model access token
+  # ⚠️ IMPORTANT if this project monitors MORE THAN ONE model: Domino scheduled jobs have no
+  # per-job env vars — only project-wide ones. Generic names collide across models' jobs
+  # (whichever was set last wins for everyone). Namespace the secret token's env var per model:
+  token_env_var: ENDPOINT_AUTH_TOKEN        # e.g. MY_MODEL_ENDPOINT_AUTH_TOKEN if sharing a project
+  # url_env_var: MY_MODEL_ENDPOINT_URL      # only needed if you truly want a URL env override
+                                              # (URL isn't secret — prefer setting `url` above instead)
+
+monitoring:
+  monitor_model_name: my_model
+  baseline_trainingset_name: my_model_baseline
+  datasource_name: ""                       # (per instance) DMM S3 datasource  [env: MONITORING_DATASOURCE_NAME]
+  datasource_type: s3
+  drift_features: [feature_a, feature_b]     # features to alert on
+  drift_algorithm: POPULATION STABILITY INDEX
+  psi_threshold: 0.2
+  prediction_path: monitoring/prediction_data/
+  ground_truth_path: monitoring/ground_truth_batches/
+
+traffic:
+  requests_per_run: 100                     # [env: REQUESTS_PER_RUN]
+  drift_switch_after_run: 8                 # [env: DRIFT_SWITCH_AFTER_RUN]
+  maturation_window_hours: 6                # [env: MATURATION_WINDOW_HOURS]
+  scoring_log_subdir: monitoring            # under $DOMINO_DATASETS_DIR/<project>/  [env: SCORING_LOG_DIR overrides full path]
+
+jobs:
+  load_generator_command: python scripts/load_generator.py
+  load_generator_cron: "0 0/15 * * * ?"     # every 15 min (Quartz, with seconds)
+  ground_truth_command: python scripts/ground_truth_generator.py
+  ground_truth_cron: "0 0 0/2 * * ?"        # every 2 hours
+  # Frequent + SELF-DELETING: polls until the DMM drift schedule can activate (blocked until the
+  # first daily ingestion), then removes its own scheduled job. Frequent is fine here — it's a
+  # fast no-op once scheduled, and short-lived since it deletes itself on success.
+  ensure_drift_scheduled_command: python scripts/ensure_drift_scheduled.py
+  ensure_drift_scheduled_cron: "0 0/10 * * * ?"   # every 10 min
+  timezone: America/New_York
+  git_ref: main                             # branch the scheduled jobs run committed code from
