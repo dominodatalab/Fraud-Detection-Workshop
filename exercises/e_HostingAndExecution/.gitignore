@@ -1,0 +1,12 @@
+# Ignore configuration files with sensitive tokens
+app_config.py
+
+# Ignore common temporary files
+*.pyc
+__pycache__/
+.DS_Store
+*.log
+.env
+
+# Ignore Streamlit cache
+.streamlit/
